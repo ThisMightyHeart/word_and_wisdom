@@ -169,6 +169,7 @@ class _BooksWidgetState extends State<BooksWidget> {
                         versionsShortName: FFAppState().translationSelection,
                       ),
                       builder: (context, snapshot) {
+                        // Customize what your widget looks like when it's loading.
                         if (!snapshot.hasData) {
                           return Center(
                             child: LinearProgressIndicator(

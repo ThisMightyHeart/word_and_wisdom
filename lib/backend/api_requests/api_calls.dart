@@ -7,6 +7,8 @@ export 'api_manager.dart' show ApiCallResponse;
 
 const _kPrivateApiFunctionName = 'ffPrivateApiCall';
 
+/// Start BibleForUApi Group Code
+
 class BibleForUApiGroup {
   static String getBaseUrl() => 'https://bible4u.net/api/v1/';
   static Map<String, String> headers = {};
@@ -107,6 +109,8 @@ class ListOfVersesCall {
     );
   }
 }
+
+/// End BibleForUApi Group Code
 
 class ApiPagingParams {
   int nextPageNumber = 0;

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "878496680887",
+    "project_id": "word-and-wisdom-bn97ia",
+    "storage_bucket": "word-and-wisdom-bn97ia.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878496680887:android:73ab192b3805338f937632",
+        "android_client_info": {
+          "package_name": "com.mycompany.wordandwisdom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5X8WlYxAN-mw1Uzrhep0-fqYPAInP6jk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

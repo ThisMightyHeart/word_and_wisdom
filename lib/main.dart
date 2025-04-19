@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'auth/firebase_auth/firebase_user_provider.dart';
+import 'auth/firebase_auth/auth_util.dart';
+
+import 'backend/firebase/firebase_config.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'index.dart';
@@ -12,10 +16,14 @@ void main() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
 
+  await initFirebase();
+
   await FlutterFlowTheme.initialize();
 
   final appState = FFAppState();
   await appState.initializePersistedState();
+
+  await initializeFirebaseRemoteConfig();
 
   runApp(ChangeNotifierProvider(
     create: (context) => appState,
@@ -50,7 +58,7 @@ class _MyAppState extends State<MyApp> {
           .map((e) => getRoute(e))
           .toList();
 
-  bool displaySplashImage = true;
+  late Stream<BaseAuthUser> userStream;
 
   @override
   void initState() {
@@ -58,9 +66,15 @@ class _MyAppState extends State<MyApp> {
 
     _appStateNotifier = AppStateNotifier.instance;
     _router = createRouter(_appStateNotifier);
-
-    Future.delayed(Duration(milliseconds: 1000),
-        () => safeSetState(() => _appStateNotifier.stopShowingSplashImage()));
+    userStream = wordAndWisdomFirebaseUserStream()
+      ..listen((user) {
+        _appStateNotifier.update(user);
+      });
+    jwtTokenStream.listen((_) {});
+    Future.delayed(
+      Duration(milliseconds: 1000),
+      () => _appStateNotifier.stopShowingSplashImage(),
+    );
   }
 
   void setThemeMode(ThemeMode mode) => safeSetState(() {
@@ -119,7 +133,7 @@ class _NavBarPageState extends State<NavBarPage> {
     final tabs = {
       'homeScreen': HomeScreenWidget(),
       'BibleIndex': BibleIndexWidget(),
-      'Bookmarks': BookmarksWidget(),
+      'bookmarksScreen': BookmarksScreenWidget(),
     };
     final currentIndex = tabs.keys.toList().indexOf(_currentPageName);
 
@@ -155,19 +169,14 @@ class _NavBarPageState extends State<NavBarPage> {
               Icons.menu_book_rounded,
               size: 24.0,
             ),
-            label: 'Home',
+            label: 'Bible',
             tooltip: '',
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              Icons.bookmark_border,
-              size: 24.0,
+              Icons.edit_note_rounded,
             ),
-            activeIcon: Icon(
-              Icons.bookmark_rounded,
-              size: 24.0,
-            ),
-            label: 'Home',
+            label: '',
             tooltip: '',
           )
         ],

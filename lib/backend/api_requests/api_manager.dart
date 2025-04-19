@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names, depend_on_referenced_packages, prefer_final_fields
+
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
@@ -60,6 +62,43 @@ class ApiCallOptions extends Equatable {
   final bool cache;
   final bool isStreamingApi;
 
+  /// Creates a new [ApiCallOptions] with optionally updated parameters.
+  ///
+  /// This helper function allows creating a copy of the current options while
+  /// selectively modifying specific fields. Any parameter that is not provided
+  /// will retain its original value from the current instance.
+  ApiCallOptions copyWith({
+    String? callName,
+    ApiCallType? callType,
+    String? apiUrl,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? params,
+    BodyType? bodyType,
+    String? body,
+    bool? returnBody,
+    bool? encodeBodyUtf8,
+    bool? decodeUtf8,
+    bool? alwaysAllowBody,
+    bool? cache,
+    bool? isStreamingApi,
+  }) {
+    return ApiCallOptions(
+      callName: callName ?? this.callName,
+      callType: callType ?? this.callType,
+      apiUrl: apiUrl ?? this.apiUrl,
+      headers: headers ?? _cloneMap(this.headers),
+      params: params ?? _cloneMap(this.params),
+      bodyType: bodyType ?? this.bodyType,
+      body: body ?? this.body,
+      returnBody: returnBody ?? this.returnBody,
+      encodeBodyUtf8: encodeBodyUtf8 ?? this.encodeBodyUtf8,
+      decodeUtf8: decodeUtf8 ?? this.decodeUtf8,
+      alwaysAllowBody: alwaysAllowBody ?? this.alwaysAllowBody,
+      cache: cache ?? this.cache,
+      isStreamingApi: isStreamingApi ?? this.isStreamingApi,
+    );
+  }
+
   ApiCallOptions clone() => ApiCallOptions(
         callName: callName,
         callType: callType,
@@ -117,12 +156,38 @@ class ApiCallResponse {
   final http.Response? response;
   final http.StreamedResponse? streamedResponse;
   final Object? exception;
+  // Whether we received a 2xx status (which generally marks success).
   bool get succeeded => statusCode >= 200 && statusCode < 300;
   String getHeader(String headerName) => headers[headerName] ?? '';
+  // Return the raw body from the response, or if this came from a cloud call
+  // and the body is not a string, then the json encoded body.
   String get bodyText =>
       response?.body ??
       (jsonBody is String ? jsonBody as String : jsonEncode(jsonBody));
   String get exceptionMessage => exception.toString();
+
+  /// Creates a new [ApiCallResponse] with optionally updated parameters.
+  ///
+  /// This helper function allows creating a copy of the current response while
+  /// selectively modifying specific fields. Any parameter that is not provided
+  /// will retain its original value from the current instance.
+  ApiCallResponse copyWith({
+    dynamic jsonBody,
+    Map<String, String>? headers,
+    int? statusCode,
+    http.Response? response,
+    http.StreamedResponse? streamedResponse,
+    Object? exception,
+  }) {
+    return ApiCallResponse(
+      jsonBody ?? this.jsonBody,
+      headers ?? this.headers,
+      statusCode ?? this.statusCode,
+      response: response ?? this.response,
+      streamedResponse: streamedResponse ?? this.streamedResponse,
+      exception: exception ?? this.exception,
+    );
+  }
 
   static ApiCallResponse fromHttpResponse(
     http.Response response,
@@ -155,12 +220,18 @@ class ApiCallResponse {
 class ApiManager {
   ApiManager._();
 
+  // Cache that will ensure identical calls are not repeatedly made.
   static Map<ApiCallOptions, ApiCallResponse> _apiCache = {};
 
   static ApiManager? _instance;
   static ApiManager get instance => _instance ??= ApiManager._();
 
+  // If your API calls need authentication, populate this field once
+  // the user has authenticated. Alter this as needed.
   static String? _accessToken;
+  // You may want to call this if, for example, you make a change to the
+  // database and no longer want the cached result of a call that may
+  // have changed.
   static void clearCache(String callName) => _apiCache.keys
       .toSet()
       .forEach((k) => k.callName == callName ? _apiCache.remove(k) : null);
@@ -354,7 +425,7 @@ class ApiManager {
       case null:
         break;
     }
-    
+    // Set "Content-Type" header if it was previously unset.
     if (contentType != null &&
         !headers.keys.any((h) => h.toLowerCase() == 'content-type')) {
       headers['Content-Type'] = contentType;
@@ -419,7 +490,7 @@ class ApiManager {
           cache: cache,
           isStreamingApi: isStreamingApi,
         );
-        
+    // Modify for your specific needs if this differs from your API.
     if (_accessToken != null) {
       headers[HttpHeaders.authorizationHeader] = 'Bearer $_accessToken';
     }
@@ -427,6 +498,8 @@ class ApiManager {
       apiUrl = 'https://$apiUrl';
     }
 
+    // If we've already made this exact call before and caching is on,
+    // return the cached result.
     if (cache && _apiCache.containsKey(callOptions)) {
       return _apiCache[callOptions]!;
     }
@@ -493,6 +566,7 @@ class ApiManager {
           break;
       }
 
+      // If caching is on, cache the result (if present).
       if (cache) {
         _apiCache[callOptions] = result;
       }

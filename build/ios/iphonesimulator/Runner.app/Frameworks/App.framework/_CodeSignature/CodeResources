@@ -10,11 +10,11 @@
 		</data>
 		<key>flutter_assets/AssetManifest.bin</key>
 		<data>
-		bV23AzwYl7vfttPKL8HVOvZWzWk=
+		gInLjs2JfV3+RSQDiQxNzwkApgc=
 		</data>
 		<key>flutter_assets/AssetManifest.json</key>
 		<data>
-		xVcchVj+ylUHgSsMS31ciQvlKVQ=
+		RBILfxrsED2zXKkkLAn46PupeGU=
 		</data>
 		<key>flutter_assets/FontManifest.json</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>flutter_assets/NOTICES.Z</key>
 		<data>
-		Mw5drnTNIBuFLDUiqzzsfIgt4WM=
+		Z0xMveTZicMuWAjd83xKAFgZKq0=
 		</data>
 		<key>flutter_assets/NativeAssetsManifest.json</key>
 		<data>
@@ -36,53 +36,9 @@
 		<data>
 		YaZ3V+0+ASndzNpun6DfJV7pKWI=
 		</data>
-		<key>flutter_assets/assets/images/Apostles.png</key>
-		<data>
-		Lna612fM7uqPDW73wpBrBJalZjo=
-		</data>
-		<key>flutter_assets/assets/images/Athanasian.png</key>
-		<data>
-		M23nNcjkkKPzA1xdjufgAPlrPd0=
-		</data>
 		<key>flutter_assets/assets/images/ChatGPT_Image_Apr_14,_2025,_06_12_40_PM.png</key>
 		<data>
 		v9V1Z6BUl+bVMjz3T6lTA9bu528=
-		</data>
-		<key>flutter_assets/assets/images/John-Calvin2.jpg</key>
-		<data>
-		6A950DwRkQ+GhOU0mLiNJRleCYY=
-		</data>
-		<key>flutter_assets/assets/images/Nicene2.png</key>
-		<data>
-		e55wLOFV4RhXaIrjg9XA30DDGQk=
-		</data>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155111.png</key>
-		<data>
-		0o+ZQYyFUZeopLBif1GAVxMFeRY=
-		</data>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155242.png</key>
-		<data>
-		Jv4a1Iz64jUOoItddDX0Mj7aAlE=
-		</data>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155333.png</key>
-		<data>
-		44BttarKSsIs6aLt4HiRcqdkMoE=
-		</data>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155418.png</key>
-		<data>
-		6zndAmdn67ATL3p/ZjZOWuBcnLk=
-		</data>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155517.png</key>
-		<data>
-		HENC7LTNjTJsMInIau+rQTQSxQc=
-		</data>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155627.png</key>
-		<data>
-		fk8wxK0OfKd7Mucr9kOx1SP6i64=
-		</data>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155701.png</key>
-		<data>
-		TAzIIr+PnD4Za9IH+RuipmdvQS8=
 		</data>
 		<key>flutter_assets/assets/images/app_launcher_icon.png</key>
 		<data>
@@ -91,22 +47,6 @@
 		<key>flutter_assets/assets/images/favicon.png</key>
 		<data>
 		YaZ3V+0+ASndzNpun6DfJV7pKWI=
-		</data>
-		<key>flutter_assets/assets/images/knox.png</key>
-		<data>
-		k5JRGC2F4ULwTF/Ve+OffoVuQJk=
-		</data>
-		<key>flutter_assets/assets/images/spurgeon-portrait_orig2.jpg</key>
-		<data>
-		yr49WhCDrTjgEI/Itlz1PKQCReA=
-		</data>
-		<key>flutter_assets/assets/images/theologian-martin-luther-underwood-archives.jpg</key>
-		<data>
-		y4KwNOJ836YZKZw/W0X3oz7NLik=
-		</data>
-		<key>flutter_assets/assets/images/zwingli.jpg</key>
-		<data>
-		7sBTOpSHGcIjIt2OZD7x8TZFxTs=
 		</data>
 		<key>flutter_assets/assets/jsons/favicon.png</key>
 		<data>
@@ -134,7 +74,7 @@
 		</data>
 		<key>flutter_assets/kernel_blob.bin</key>
 		<data>
-		CJIJMFaqcLtUznr1NCzPMqh4TZk=
+		gtsw0tKRZZUU1dTltWx5bNNNJHg=
 		</data>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -167,14 +107,14 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			zUpqlBVBukDNGz1VMRv6eRap9Ir4+TkCsO0cAjMbzJ8=
+			o1dQvB/vgMkuETDnOBiPTeEB/XJ1lCCzusLkKbeWzlc=
 			</data>
 		</dict>
 		<key>flutter_assets/AssetManifest.json</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			J/1fHTvs05buVvMQLOtw2qRvpD/1cK9HB2Rj6AYvaok=
+			nibsyMCdou8BmDUEPEFep1hHTevQO9y1Eyz9u6Jq0qs=
 			</data>
 		</dict>
 		<key>flutter_assets/FontManifest.json</key>
@@ -188,7 +128,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			dXyF4ePSOXV83jN46dt9Gi/YU6L9sp2+ZqTMUtfTJ/w=
+			k9cNUiPMVn7jorKJm/JmYbYeR9vDo2h01KCn9XKZmik=
 			</data>
 		</dict>
 		<key>flutter_assets/NativeAssetsManifest.json</key>
@@ -212,88 +152,11 @@
 			erJSX0uGtl0+THA1ihfloar29Df5nLzARtrXPVm7kBU=
 			</data>
 		</dict>
-		<key>flutter_assets/assets/images/Apostles.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			qi5SqIld9K1Uh2v+hp37DsJxOtmvjQgqIYZ/bPax4BE=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Athanasian.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			+68SlkWWx3Qw79edHUbgPrRJvIvi3/alZwRgjIb6Fd0=
-			</data>
-		</dict>
 		<key>flutter_assets/assets/images/ChatGPT_Image_Apr_14,_2025,_06_12_40_PM.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
 			q4kpahJpvgi5PYbcpl4jG8traCbiuvVU7HGoS4z1REY=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/John-Calvin2.jpg</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			Cpu/gyf82c3bwP/pKNOAUs8lFZ88IFZH15gqhC6seVk=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Nicene2.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			tO9UWv9xe7yTTuv+YfMjtSSinkg+UB8ph5NznJ6nXPQ=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155111.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			JSHWePWkTUd+fxFR/og/+NRylYmS9+WSnPH4/cfy9Wg=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155242.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			3IgJl0JQzAowqB14kXCab0MnfmYrnhwJBnAKStl7oFQ=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155333.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			1/QXKuLFPVR76NF2RDHjDWBOGtigvY0lGjKeFcK8UVY=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155418.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			RuVf8AbdJVoZIeSzud5xpIZaSlWWhOzfey7klbIl6q8=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155517.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			0ECmAZOo3b9IIHcdzOUUBJpskrLIo0ntQZPhplpys5k=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155627.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			raIbju8Ilq23kq9YeRwXDybzHCd7AZrORVywwVqx7Ag=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/Screenshot_2025-04-14_155701.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			T+I+t8hKdYYLuYK0PKivhuUsPg0adXtvZfZ6U6pYeXo=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/images/app_launcher_icon.png</key>
@@ -308,34 +171,6 @@
 			<key>hash2</key>
 			<data>
 			erJSX0uGtl0+THA1ihfloar29Df5nLzARtrXPVm7kBU=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/knox.png</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			wRafCEq7Hkascpz0AT1pR/JhVSOgivEgLm6k1DKd80U=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/spurgeon-portrait_orig2.jpg</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			0iiG9La2kCuB9e1LXDCfRptfk+Hd3AwBgex9B9eOO9I=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/theologian-martin-luther-underwood-archives.jpg</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			ll1p5nLOnzjvkAOX43n7vXkr6UAy+ohMjyX09X72d8o=
-			</data>
-		</dict>
-		<key>flutter_assets/assets/images/zwingli.jpg</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			eAIzY4F17gieUvg2OphA0zdZlzYHDiVIGJ/s8lEL12s=
 			</data>
 		</dict>
 		<key>flutter_assets/assets/jsons/favicon.png</key>
@@ -384,7 +219,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			xFfp75kngNaJwRTZlqPS8WucwJMG7KjZmRFj6DNzL6I=
+			0lfALxDvrGGZQ8P01K/C66DERvGLAdvPGNnXvE03rV8=
 			</data>
 		</dict>
 		<key>flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>

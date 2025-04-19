@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '/auth/base_auth_user_provider.dart';
+
 import '/main.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 
@@ -21,7 +23,36 @@ class AppStateNotifier extends ChangeNotifier {
   static AppStateNotifier? _instance;
   static AppStateNotifier get instance => _instance ??= AppStateNotifier._();
 
+  BaseAuthUser? initialUser;
+  BaseAuthUser? user;
   bool showSplashImage = true;
+  String? _redirectLocation;
+
+
+  bool notifyOnAuthChange = true;
+
+  bool get loading => user == null || showSplashImage;
+  bool get loggedIn => user?.loggedIn ?? false;
+  bool get initiallyLoggedIn => initialUser?.loggedIn ?? false;
+  bool get shouldRedirect => loggedIn && _redirectLocation != null;
+
+  String getRedirectLocation() => _redirectLocation!;
+  bool hasRedirect() => _redirectLocation != null;
+  void setRedirectLocationIfUnset(String loc) => _redirectLocation ??= loc;
+  void clearRedirectLocation() => _redirectLocation = null;
+
+  void updateNotifyOnAuthChange(bool notify) => notifyOnAuthChange = notify;
+
+  void update(BaseAuthUser newUser) {
+    final shouldUpdate =
+        user?.uid == null || newUser.uid == null || user?.uid != newUser.uid;
+    initialUser ??= newUser;
+    user = newUser;
+    if (notifyOnAuthChange && shouldUpdate) {
+      notifyListeners();
+    }
+    updateNotifyOnAuthChange(true);
+  }
 
   void stopShowingSplashImage() {
     showSplashImage = false;
@@ -30,78 +61,64 @@ class AppStateNotifier extends ChangeNotifier {
 }
 
 GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
-      initialLocation: '/',
-      debugLogDiagnostics: true,
-      refreshListenable: appStateNotifier,
-      navigatorKey: appNavigatorKey,
-      errorBuilder: (context, state) => appStateNotifier.showSplashImage
-          ? Builder(
-              builder: (context) => Container(
-                color: Color(0xFF0E0D0D),
-                child: Image.asset(
-                  'assets/images/ChatGPT_Image_Apr_14,_2025,_06_12_40_PM.png',
-                  fit: BoxFit.contain,
-                ),
-              ),
-            )
-          : NavBarPage(),
-      routes: [
-        FFRoute(
-          name: '_initialize',
-          path: '/',
-          builder: (context, _) => appStateNotifier.showSplashImage
-              ? Builder(
-                  builder: (context) => Container(
-                    color: Color(0xFF0E0D0D),
-                    child: Image.asset(
-                      'assets/images/ChatGPT_Image_Apr_14,_2025,_06_12_40_PM.png',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                )
-              : NavBarPage(),
+  initialLocation: '/',
+  debugLogDiagnostics: true,
+  refreshListenable: appStateNotifier,
+  navigatorKey: appNavigatorKey,
+  errorBuilder: (context, state) =>
+      appStateNotifier.loggedIn ? NavBarPage(initialPage: 'homeScreen') : HomeScreenWidget(),
+  routes: [
+    FFRoute(
+      name: '_initialize',
+      path: '/',
+      builder: (context, _) =>
+          appStateNotifier.loggedIn ? NavBarPage(initialPage: 'homeScreen') : HomeScreenWidget(),
+    ),
+    FFRoute(
+      name: BibleIndexWidget.routeName,
+      path: BibleIndexWidget.routePath,
+      builder: (context, params) => NavBarPage(
+        initialPage: 'BibleIndex',
+        page: BibleIndexWidget(
+          getBooksShortName: params.getParam(
+            'getBooksShortName',
+            ParamType.String,
+          ),
+          getChaptersNumbers: params.getParam(
+            'getChaptersNumbers',
+            ParamType.String,
+          ),
+          getVersesNumbers: params.getParam(
+            'getVersesNumbers',
+            ParamType.String,
+          ),
         ),
-        FFRoute(
-          name: BibleIndexWidget.routeName,
-          path: BibleIndexWidget.routePath,
-          builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'BibleIndex')
-              : BibleIndexWidget(
-                  getBooksShortName: params.getParam(
-                    'getBooksShortName',
-                    ParamType.String,
-                  ),
-                  getChaptersNumbers: params.getParam(
-                    'getChaptersNumbers',
-                    ParamType.String,
-                  ),
-                  getVersesNumbers: params.getParam(
-                    'getVersesNumbers',
-                    ParamType.String,
-                  ),
-                ),
-        ),
-        FFRoute(
-          name: VersionWidget.routeName,
-          path: VersionWidget.routePath,
-          builder: (context, params) => VersionWidget(),
-        ),
-        FFRoute(
-          name: BookmarksWidget.routeName,
-          path: BookmarksWidget.routePath,
-          builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'Bookmarks')
-              : BookmarksWidget(),
-        ),
-        FFRoute(
-          name: HomeScreenWidget.routeName,
-          path: HomeScreenWidget.routePath,
-          builder: (context, params) => params.isEmpty
-              ? NavBarPage(initialPage: 'homeScreen')
-              : HomeScreenWidget(),
-        )
-      ].map((r) => r.toRoute(appStateNotifier)).toList(),
-    );
+      ),
+    ),
+    FFRoute(
+      name: VersionWidget.routeName,
+      path: VersionWidget.routePath,
+      builder: (context, params) => VersionWidget(),
+    ),
+    FFRoute(
+      name: HomeScreenWidget.routeName,
+      path: HomeScreenWidget.routePath,
+      builder: (context, params) => NavBarPage(
+        initialPage: 'homeScreen',
+        page: HomeScreenWidget(),
+      ),
+    ),
+    FFRoute(
+      name: BookmarksScreenWidget.routeName,
+      path: BookmarksScreenWidget.routePath,
+      builder: (context, params) => NavBarPage(
+        initialPage: 'bookmarksScreen',
+        page: BookmarksScreenWidget(),
+      ),
+    ),
+  ].map((r) => r.toRoute(appStateNotifier)).toList(),
+);
+
 
 extension NavParamExtensions on Map<String, String?> {
   Map<String, String> get withoutNulls => Map.fromEntries(
@@ -112,6 +129,40 @@ extension NavParamExtensions on Map<String, String?> {
 }
 
 extension NavigationExtensions on BuildContext {
+  void goNamedAuth(
+    String name,
+    bool mounted, {
+    Map<String, String> pathParameters = const <String, String>{},
+    Map<String, String> queryParameters = const <String, String>{},
+    Object? extra,
+    bool ignoreRedirect = false,
+  }) =>
+      !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
+          ? null
+          : goNamed(
+              name,
+              pathParameters: pathParameters,
+              queryParameters: queryParameters,
+              extra: extra,
+            );
+
+  void pushNamedAuth(
+    String name,
+    bool mounted, {
+    Map<String, String> pathParameters = const <String, String>{},
+    Map<String, String> queryParameters = const <String, String>{},
+    Object? extra,
+    bool ignoreRedirect = false,
+  }) =>
+      !mounted || GoRouter.of(this).shouldRedirect(ignoreRedirect)
+          ? null
+          : pushNamed(
+              name,
+              pathParameters: pathParameters,
+              queryParameters: queryParameters,
+              extra: extra,
+            );
+
   void safePop() {
     if (canPop()) {
       pop();
@@ -119,6 +170,19 @@ extension NavigationExtensions on BuildContext {
       go('/');
     }
   }
+}
+
+extension GoRouterExtensions on GoRouter {
+  AppStateNotifier get appState => AppStateNotifier.instance;
+  void prepareAuthEvent([bool ignoreRedirect = false]) =>
+      appState.hasRedirect() && !ignoreRedirect
+          ? null
+          : appState.updateNotifyOnAuthChange(false);
+  bool shouldRedirect(bool ignoreRedirect) =>
+      !ignoreRedirect && appState.hasRedirect();
+  void clearRedirectLocation() => appState.clearRedirectLocation();
+  void setRedirectLocationIfUnset(String location) =>
+      appState.updateNotifyOnAuthChange(false);
 }
 
 extension _GoRouterStateExtensions on GoRouterState {
@@ -177,6 +241,7 @@ class FFParameters {
     if (param is! String) {
       return param;
     }
+
     return deserializeParam<T>(
       param,
       type,
@@ -205,6 +270,19 @@ class FFRoute {
   GoRoute toRoute(AppStateNotifier appStateNotifier) => GoRoute(
         name: name,
         path: path,
+        redirect: (context, state) {
+          if (appStateNotifier.shouldRedirect) {
+            final redirectLocation = appStateNotifier.getRedirectLocation();
+            appStateNotifier.clearRedirectLocation();
+            return redirectLocation;
+          }
+
+          if (requireAuth && !appStateNotifier.loggedIn) {
+            appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
+            return '/homeScreen';
+          }
+          return null;
+        },
         pageBuilder: (context, state) {
           fixStatusBarOniOS16AndBelow(context);
           final ffParams = FFParameters(state, asyncParams);
@@ -214,7 +292,15 @@ class FFRoute {
                   builder: (context, _) => builder(context, ffParams),
                 )
               : builder(context, ffParams);
-          final child = page;
+          final child = appStateNotifier.loading
+              ? Container(
+                  color: Color(0xFF0E0D0D),
+                  child: Image.asset(
+                    'assets/images/ChatGPT_Image_Apr_14,_2025,_06_12_40_PM.png',
+                    fit: BoxFit.contain,
+                  ),
+                )
+              : page;
 
           final transitionInfo = state.transitionInfo;
           return transitionInfo.hasTransition
