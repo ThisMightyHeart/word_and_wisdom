@@ -26,7 +26,6 @@ class _BookmarksScreenWidgetState extends State<BookmarksScreenWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => BookmarksScreenModel());
-
     _model.textController ??= TextEditingController();
     _model.textFieldFocusNode ??= FocusNode();
   }
@@ -34,12 +33,27 @@ class _BookmarksScreenWidgetState extends State<BookmarksScreenWidget> {
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
+  }
+
+  // Filter bookmarks based on type and search query
+  List<Bookmark> getFilteredBookmarks() {
+    final filter = _model.choiceChipsValue ?? 'All';
+    final query = _model.textController?.text.toLowerCase() ?? '';
+
+    return _model.bookmarks.where((bookmark) {
+      final matchesType = filter == 'All' || bookmark.type == filter;
+      final matchesQuery = query.isEmpty ||
+          bookmark.verse.toLowerCase().contains(query) ||
+          bookmark.note.toLowerCase().contains(query);
+      return matchesType && matchesQuery;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final filteredBookmarks = getFilteredBookmarks();
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -48,6 +62,18 @@ class _BookmarksScreenWidgetState extends State<BookmarksScreenWidget> {
       child: Scaffold(
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Simplified: Add a dummy bookmark for demo purposes
+            _model.addBookmark(Bookmark(
+              verse: 'John 3:16',
+              note: 'For God so loved the world...',
+              type: 'Bookmark',
+            ));
+          },
+          child: Icon(Icons.add),
+          backgroundColor: FlutterFlowTheme.of(context).primary,
+        ),
         body: NestedScrollView(
           floatHeaderSlivers: true,
           headerSliverBuilder: (context, _) => [
@@ -212,6 +238,7 @@ class _BookmarksScreenWidgetState extends State<BookmarksScreenWidget> {
                                         ),
                                     validator: _model.textControllerValidator
                                         .asValidator(context),
+                                    onChanged: (value) => safeSetState(() {}),
                                   ),
                                 ),
                               ].divide(SizedBox(width: 8.0)),
@@ -222,18 +249,28 @@ class _BookmarksScreenWidgetState extends State<BookmarksScreenWidget> {
                       Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(
                             16.0, 16.0, 16.0, 16.0),
-                        child: ListView(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          children: [
-                            wrapWithModel(
-                              model: _model.bookmarkCardModel,
-                              updateCallback: () => safeSetState(() {}),
-                              child: BookmarkCardWidget(),
-                            ),
-                          ],
-                        ),
+                        child: filteredBookmarks.isEmpty
+                            ? Center(child: Text('No bookmarks found.'))
+                            : ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemCount: filteredBookmarks.length,
+                                itemBuilder: (context, index) {
+                                  final bookmark = filteredBookmarks[index];
+                                  return wrapWithModel(
+                                    model: _model.bookmarkCardModels.getModel(
+                                        index.toString(), index),
+                                    updateCallback: () => safeSetState(() {}),
+                                    child: BookmarkCardWidget(
+                                      key: ValueKey(index.toString()),
+                                      bookmark: bookmark,
+                                      onDelete: () =>
+                                          _model.removeBookmark(index),
+                                    ),
+                                  );
+                                },
+                              ),
                       ),
                     ],
                   ),

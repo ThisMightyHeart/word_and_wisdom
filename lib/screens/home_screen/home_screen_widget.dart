@@ -31,7 +31,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
@@ -203,17 +202,11 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
                           ),
                         ),
                       ),
-
                       Padding(
                         padding:
                             EdgeInsetsDirectional.fromSTEB(0.0, 8.0, 0.0, 0.0),
                         child: ListView(
-                          padding: EdgeInsets.fromLTRB(
-                            0,
-                            0,
-                            0,
-                            44.0,
-                          ),
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 44.0),
                           primary: false,
                           shrinkWrap: true,
                           scrollDirection: Axis.vertical,
@@ -221,40 +214,58 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget> {
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 10.0, 5.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(
-                                  'https://i.postimg.cc/63jxbvrZ/Nicene2.png',
-                                  width: 200.0,
-                                  height: 200.0,
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment(0.0, 1.0),
+                              child: GestureDetector(
+                                onTap: () => context.pushNamed('CreedDetail',
+                                    queryParameters: {'creed': 'Nicene'}),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    'https://i.postimg.cc/63jxbvrZ/Nicene2.png',
+                                    width: 200.0,
+                                    height: 200.0,
+                                    fit: BoxFit.cover,
+                                    alignment: Alignment(0.0, 1.0),
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        Icon(Icons.error, size: 50.0),
+                                  ),
                                 ),
                               ),
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 10.0, 5.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(
-                                  'https://i.postimg.cc/PqMjZcN2/Apostles.png',
-                                  width: 200.0,
-                                  height: 200.0,
-                                  fit: BoxFit.cover,
+                              child: GestureDetector(
+                                onTap: () => context.pushNamed('CreedDetail',
+                                    queryParameters: {'creed': 'Apostles'}),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    'https://i.postimg.cc/PqMjZcN2/Apostles.png',
+                                    width: 200.0,
+                                    height: 200.0,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        Icon(Icons.error, size: 50.0),
+                                  ),
                                 ),
                               ),
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.fromSTEB(
                                   10.0, 0.0, 10.0, 5.0),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(8.0),
-                                child: Image.network(
-                                  'https://i.postimg.cc/sXDRJchy/Athanasian.png',
-                                  width: 200.0,
-                                  height: 200.0,
-                                  fit: BoxFit.cover,
+                              child: GestureDetector(
+                                onTap: () => context.pushNamed('CreedDetail',
+                                    queryParameters: {'creed': 'Athanasian'}),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  child: Image.network(
+                                    'https://i.postimg.cc/sXDRJchy/Athanasian.png',
+                                    width: 200.0,
+                                    height: 200.0,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) =>
+                                        Icon(Icons.error, size: 50.0),
+                                  ),
                                 ),
                               ),
                             ),

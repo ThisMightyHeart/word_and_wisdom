@@ -28,7 +28,6 @@ class AppStateNotifier extends ChangeNotifier {
   bool showSplashImage = true;
   String? _redirectLocation;
 
-
   bool notifyOnAuthChange = true;
 
   bool get loading => user == null || showSplashImage;
@@ -116,9 +115,15 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         page: BookmarksScreenWidget(),
       ),
     ),
+    FFRoute(
+      name: 'CreedDetail',
+      path: '/creedDetail',
+      builder: (context, params) => CreedDetailWidget(
+        creed: params.getParam('creed', ParamType.String),
+      ),
+    ),
   ].map((r) => r.toRoute(appStateNotifier)).toList(),
 );
-
 
 extension NavParamExtensions on Map<String, String?> {
   Map<String, String> get withoutNulls => Map.fromEntries(
