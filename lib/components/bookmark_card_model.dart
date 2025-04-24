@@ -1,6 +1,6 @@
 import '/flutter_flow/flutter_flow_util.dart';
-import 'bookmark_card_widget.dart' show BookmarkCardWidget;
 import 'package:flutter/material.dart';
+import 'bookmark_card_widget.dart';
 
 class BookmarkCardModel extends FlutterFlowModel<BookmarkCardWidget> {
   @override
