@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/index.dart'; // Your screens
+import '/index.dart'; // Import your screens
 
 class NavBarPage extends StatefulWidget {
   const NavBarPage({Key? key, this.initialPage, this.page}) : super(key: key);
@@ -14,7 +14,7 @@ class NavBarPage extends StatefulWidget {
 }
 
 class _NavBarPageState extends State<NavBarPage> {
-  late String _currentPageName;
+  String _currentPageName = 'homeScreen';
   Widget? _currentPage;
 
   final Map<String, Widget> _tabs = {
@@ -27,7 +27,7 @@ class _NavBarPageState extends State<NavBarPage> {
   void initState() {
     super.initState();
     _currentPageName = widget.initialPage ?? 'homeScreen';
-    _currentPage = widget.page ?? _tabs[_currentPageName];
+    _currentPage = widget.page;
   }
 
   @override
@@ -35,15 +35,13 @@ class _NavBarPageState extends State<NavBarPage> {
     final currentIndex = _tabs.keys.toList().indexOf(_currentPageName);
 
     return Scaffold(
-      body: _currentPage,
+      body: _currentPage ?? _tabs[_currentPageName],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentPageName = _tabs.keys.elementAt(index);
-            _currentPage = _tabs[_currentPageName];
-          });
-        },
+        onTap: (i) => setState(() {
+          _currentPageName = _tabs.keys.toList()[i];
+          _currentPage = null; // THIS FIXES YOUR ISSUE
+        }),
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         selectedItemColor: FlutterFlowTheme.of(context).primary,
         unselectedItemColor: FlutterFlowTheme.of(context).secondaryText,

@@ -12,9 +12,6 @@ export 'version_model.dart';
 class VersionWidget extends StatefulWidget {
   const VersionWidget({Key? key}) : super(key: key);
 
-  static String routeName = 'Version';
-  static String routePath = '/version';
-
   @override
   _VersionWidgetState createState() => _VersionWidgetState();
 }
@@ -26,7 +23,6 @@ class _VersionWidgetState extends State<VersionWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => VersionModel());
-
     _model.seachTextFieldTextController ??= TextEditingController();
     _model.seachTextFieldFocusNode ??= FocusNode();
   }
@@ -61,13 +57,13 @@ class _VersionWidgetState extends State<VersionWidget> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // Search Bar
+            // Search bar
             TextFormField(
               controller: _model.seachTextFieldTextController,
               focusNode: _model.seachTextFieldFocusNode,
               decoration: InputDecoration(
                 hintText: 'Search versions...',
-                prefixIcon: Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide(
@@ -78,11 +74,10 @@ class _VersionWidgetState extends State<VersionWidget> {
               style: FlutterFlowTheme.of(context).bodyMedium,
             ),
             const SizedBox(height: 16),
-
-            // List of Bible Versions
+            // List of versions
             Expanded(
               child: FutureBuilder<ApiCallResponse>(
-                future: BibleForUApiGroup.listOfVersionsCall.call(),
+                future: BibleForUApiGroup.listOfVersionsCall.call(), // ← FIXED!
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return const Center(child: CircularProgressIndicator());
@@ -91,9 +86,9 @@ class _VersionWidgetState extends State<VersionWidget> {
                   final versionsList = getJsonField(
                     versionsResponse.jsonBody,
                     r'''$.data.versions[:]''',
-                  ).toList();
+                  )?.toList() ?? [];
 
-                  // Filter by search text
+                  // Search filter
                   final searchText = _model.seachTextFieldTextController?.text.toLowerCase() ?? '';
                   final filteredVersions = searchText.isEmpty
                       ? versionsList
