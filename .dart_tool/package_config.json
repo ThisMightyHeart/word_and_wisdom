@@ -279,7 +279,7 @@
     },
     {
       "name": "google_identity_services_web",
-      "rootUri": "file:///Users/valariewebb/.pub-cache/hosted/pub.dev/google_identity_services_web-0.3.3",
+      "rootUri": "file:///Users/valariewebb/.pub-cache/hosted/pub.dev/google_identity_services_web-0.3.3+1",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },
@@ -746,7 +746,7 @@
       "languageVersion": "3.0"
     }
   ],
-  "generated": "2025-04-22T22:26:37.291919Z",
+  "generated": "2025-04-30T19:43:25.910091Z",
   "generator": "pub",
   "generatorVersion": "3.7.2",
   "flutterRoot": "file:///Users/valariewebb/flutter",
