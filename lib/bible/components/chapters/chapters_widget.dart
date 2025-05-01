@@ -4,7 +4,6 @@ import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -41,6 +40,7 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
   @override
   void dispose() {
     _model.maybeDispose();
+
     super.dispose();
   }
 
@@ -83,9 +83,16 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                 Text(
                   'Chapters',
                   style: FlutterFlowTheme.of(context).bodyMedium.override(
-                        fontFamily: 'Plus Jakarta Sans',
+                        font: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w600,
+                          fontStyle:
+                              FlutterFlowTheme.of(context).bodyMedium.fontStyle,
+                        ),
                         fontSize: 16.0,
+                        letterSpacing: 0.0,
                         fontWeight: FontWeight.w600,
+                        fontStyle:
+                            FlutterFlowTheme.of(context).bodyMedium.fontStyle,
                       ),
                 ),
               ],
@@ -93,95 +100,126 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(20.0),
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Expanded(
                     child: FutureBuilder<ApiCallResponse>(
                       future: BibleForUApiGroup.listofChaptersCall.call(
-                        versionsShortName: FFAppState().translationSelection.isEmpty 
-                            ? 'KJV' // Provide default translation if none selected
-                            : FFAppState().translationSelection,
-                        booksShortName: widget.getBooksShortName ?? 'Gen', // Provide default book if none selected
+                        versionsShortName: FFAppState().translationSelection,
+                        booksShortName: widget.getBooksShortName,
                       ),
                       builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        }
-
+                        // Customize what your widget looks like when it's loading.
                         if (!snapshot.hasData) {
                           return Center(
-                            child: CircularProgressIndicator(),
+                            child: LinearProgressIndicator(
+                              color: FlutterFlowTheme.of(context).primary,
+                            ),
                           );
                         }
+                        final chaptersGridViewListofChaptersResponse =
+                            snapshot.data!;
 
-                        final chapters = (getJsonField(
-                          snapshot.data!.jsonBody,
-                          r'''$.data.chapters''',
-                        ) as List?)?.toList() ?? [];
+                        return Builder(
+                          builder: (context) {
+                            final chapterItems = getJsonField(
+                              chaptersGridViewListofChaptersResponse.jsonBody,
+                              r'''$.data.chapters[:]''',
+                            ).toList();
 
-                        if (chapters.isEmpty) {
-                          return const Center(child: Text('No chapters found.'));
-                        }
-
-                        return GridView.builder(
-                          padding: EdgeInsets.zero,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 10.0,
-                            mainAxisSpacing: 10.0,
-                            childAspectRatio: 1.0,
-                          ),
-                          shrinkWrap: true,
-                          scrollDirection: Axis.vertical,
-                          itemCount: chapters.length,
-                          itemBuilder: (context, index) {
-                            final chapter = chapters[index];
-                            return FFButtonWidget(
-                              onPressed: () async {
-                                await showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  backgroundColor: Colors.transparent,
-                                  context: context,
-                                  builder: (context) {
-                                    return Padding(
-                                      padding: MediaQuery.viewInsetsOf(context),
-                                      child: SizedBox(
-                                        height: MediaQuery.sizeOf(context).height * 0.9,
-                                        child: VersesWidget(
-                                          getBooksShortName: widget.getBooksShortName,
-                                          chaptersNum: getJsonField(
-                                            chapter,
-                                            r'''$.ref''',
-                                          ).toString(),
-                                        ),
-                                      ),
-                                    );
+                            return GridView.builder(
+                              padding: EdgeInsets.zero,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 10.0,
+                                mainAxisSpacing: 10.0,
+                                childAspectRatio: 1.0,
+                              ),
+                              shrinkWrap: true,
+                              scrollDirection: Axis.vertical,
+                              itemCount: chapterItems.length,
+                              itemBuilder: (context, chapterItemsIndex) {
+                                final chapterItemsItem =
+                                    chapterItems[chapterItemsIndex];
+                                return FFButtonWidget(
+                                  onPressed: () async {
+                                    await showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      context: context,
+                                      builder: (context) {
+                                        return Padding(
+                                          padding:
+                                              MediaQuery.viewInsetsOf(context),
+                                          child: Container(
+                                            height: MediaQuery.sizeOf(context)
+                                                    .height *
+                                                0.9,
+                                            child: VersesWidget(
+                                              getBooksShortName:
+                                                  widget.getBooksShortName,
+                                              chaptersNum: getJsonField(
+                                                chapterItemsItem,
+                                                r'''$.ref''',
+                                              ).toString(),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ).then((value) => safeSetState(() {}));
                                   },
+                                  text: getJsonField(
+                                    chapterItemsItem,
+                                    r'''$.ref''',
+                                  ).toString(),
+                                  options: FFButtonOptions(
+                                    width: 130.0,
+                                    height: 40.0,
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryBackground,
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .titleSmall
+                                        .override(
+                                          font: GoogleFonts.plusJakartaSans(
+                                            fontWeight:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleSmall
+                                                    .fontWeight,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .titleSmall
+                                                    .fontStyle,
+                                          ),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryText,
+                                          letterSpacing: 0.0,
+                                          fontWeight:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .fontWeight,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .titleSmall
+                                                  .fontStyle,
+                                        ),
+                                    borderSide: BorderSide(
+                                      color: FlutterFlowTheme.of(context)
+                                          .primaryText,
+                                      width: 1.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(0.0),
+                                    hoverColor:
+                                        FlutterFlowTheme.of(context).accent3,
+                                  ),
                                 );
                               },
-                              text: getJsonField(
-                                chapter,
-                                r'''$.ref''',
-                              ).toString(),
-                              options: FFButtonOptions(
-                                width: 130.0,
-                                height: 40.0,
-                                padding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                                iconPadding: const EdgeInsetsDirectional.fromSTEB(0, 0, 0, 0),
-                                color: FlutterFlowTheme.of(context).secondaryBackground,
-                                textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      color: FlutterFlowTheme.of(context).primaryText,
-                                    ),
-                                borderSide: BorderSide(
-                                  color: FlutterFlowTheme.of(context).primaryText,
-                                  width: 1.0,
-                                ),
-                                borderRadius: BorderRadius.circular(0.0),
-                                hoverColor: FlutterFlowTheme.of(context).accent3,
-                              ),
                             );
                           },
                         );

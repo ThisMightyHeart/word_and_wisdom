@@ -14,29 +14,58 @@ const _kPrivateApiFunctionName = 'ffPrivateApiCall';
 class BibleForUApiGroup {
   static String getBaseUrl() => 'https://bible4u.net/api/v1/';
   static Map<String, String> headers = {};
-  static ListOfVersionsCall listOfVersionsCall = ListOfVersionsCall();
-  static ListOfBooksCall listOfBooksCall = ListOfBooksCall();
-  static ListofChaptersCall listofChaptersCall = ListofChaptersCall();
-  static ListOfVersesCall listOfVersesCall = ListOfVersesCall();
+  static final ListOfVersionsCall listOfVersionsCall = ListOfVersionsCall();
+  static final ListOfBooksCall listOfBooksCall = ListOfBooksCall();
+  static final ListofChaptersCall listofChaptersCall = ListofChaptersCall();
+  static final ListOfVersesCall listOfVersesCall = ListOfVersesCall();
 }
 
 class ListOfVersionsCall {
   Future<ApiCallResponse> call() async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
+    try {
+      final response = await ApiManager.instance.makeApiCall(
+        callName: 'ListOfVersions',
+        apiUrl: '${baseUrl}bibles',
+        callType: ApiCallType.GET,
+        headers: {
+          'Accept': 'application/json',
+        },
+        params: {},
+        returnBody: true,
+        encodeBodyUtf8: false,
+        decodeUtf8: true,
+        cache: false,
+        isStreamingApi: false,
+        alwaysAllowBody: false,
+      );
 
-    return ApiManager.instance.makeApiCall(
-      callName: 'ListOfVersions',
-      apiUrl: '${baseUrl}versions',
-      callType: ApiCallType.GET,
-      headers: {},
-      params: {},
-      returnBody: true,
-      encodeBodyUtf8: false,
-      decodeUtf8: false,
-      cache: false,
-      isStreamingApi: false,
-      alwaysAllowBody: false,
-    );
+      if (response.succeeded && response.jsonBody != null) {
+        final Map<String, dynamic> formattedResponse = {
+          'data': response.jsonBody['data'] ?? [],
+          'success': response.jsonBody['success'] ?? false
+        };
+        
+        return ApiCallResponse(
+          formattedResponse,
+          response.headers,
+          response.statusCode,
+        );
+      }
+      
+      return response;
+    } catch (e) {
+      print('API call error: $e');
+      return ApiCallResponse(
+        {
+          'data': [],
+          'success': false,
+          'error': e.toString()
+        },
+        {},
+        500,
+      );
+    }
   }
 }
 
@@ -45,16 +74,17 @@ class ListOfBooksCall {
     String? versionsShortName = '',
   }) async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
-
     return ApiManager.instance.makeApiCall(
       callName: 'ListOfBooks',
       apiUrl: '${baseUrl}bibles/$versionsShortName',
       callType: ApiCallType.GET,
-      headers: {},
+      headers: {
+        'Accept': 'application/json',
+      },
       params: {},
       returnBody: true,
       encodeBodyUtf8: false,
-      decodeUtf8: false,
+      decodeUtf8: true,
       cache: false,
       isStreamingApi: false,
       alwaysAllowBody: false,
@@ -68,16 +98,17 @@ class ListofChaptersCall {
     String? booksShortName = '',
   }) async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
-
     return ApiManager.instance.makeApiCall(
       callName: 'ListofChapters',
       apiUrl: '${baseUrl}bibles/$versionsShortName/books/$booksShortName',
       callType: ApiCallType.GET,
-      headers: {},
+      headers: {
+        'Accept': 'application/json',
+      },
       params: {},
       returnBody: true,
       encodeBodyUtf8: false,
-      decodeUtf8: false,
+      decodeUtf8: true,
       cache: false,
       isStreamingApi: false,
       alwaysAllowBody: false,
@@ -92,16 +123,17 @@ class ListOfVersesCall {
     String? chaptersNum = '',
   }) async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
-
     return ApiManager.instance.makeApiCall(
       callName: 'ListOfVerses',
       apiUrl: '${baseUrl}bibles/$versionShortName/books/$booksShortName/chapters/$chaptersNum',
-      callType: ApiCallType.GET, 
-      headers: {},
+      callType: ApiCallType.GET,
+      headers: {
+        'Accept': 'application/json',
+      },
       params: {},
       returnBody: true,
       encodeBodyUtf8: false,
-      decodeUtf8: false,
+      decodeUtf8: true,
       cache: false,
       isStreamingApi: false,
       alwaysAllowBody: false,

@@ -1,9 +1,9 @@
 import '/backend/api_requests/api_calls.dart';
 import '/bible/components/books/books_widget.dart';
-import '/bible/version/version_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +11,12 @@ import 'bible_index_model.dart';
 export 'bible_index_model.dart';
 
 class BibleIndexWidget extends StatefulWidget {
-  const BibleIndexWidget({super.key, this.getBooksShortName, this.getChaptersNumbers, this.getVersesNumbers});
+  const BibleIndexWidget({
+    super.key,
+    this.getBooksShortName,
+    this.getChaptersNumbers,
+    this.getVersesNumbers,
+  });
 
   final String? getBooksShortName;
   final String? getChaptersNumbers;
@@ -27,6 +32,8 @@ class BibleIndexWidget extends StatefulWidget {
 class _BibleIndexWidgetState extends State<BibleIndexWidget> {
   late BibleIndexModel _model;
 
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -36,6 +43,7 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
   @override
   void dispose() {
     _model.dispose();
+
     super.dispose();
   }
 
@@ -43,130 +51,394 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
   Widget build(BuildContext context) {
     context.watch<FFAppState>();
 
-    return Scaffold(
-      backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Material(
-              color: Colors.transparent,
-              elevation: 1.0,
-              child: Container(
-                padding: const EdgeInsets.all(15),
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        FFButtonWidget(
-                          onPressed: () async {
-                            await showModalBottomSheet(
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              builder: (context) => const BooksWidget(),
-                            );
-                          },
-                          text: valueOrDefault<String>(
-                            widget.getBooksShortName,
-                            'Gen',
-                          ),
-                          options: FFButtonOptions(
-                            width: 100,
-                            padding: const EdgeInsets.all(15),
-                            color: FlutterFlowTheme.of(context).lineColor,
-                            textStyle: FlutterFlowTheme.of(context).labelLarge,
-                            borderRadius: BorderRadius.circular(0),
-                          ),
-                        ),
-                        const SizedBox(width: 5),
-                        FFButtonWidget(
-                          onPressed: () async {
-                            await showModalBottomSheet(
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              builder: (context) => const VersionWidget(),
-                            );
-                          },
-                          text: FFAppState().translationSelection.isEmpty 
-                              ? 'KJV' // Provide default translation if none selected
-                              : FFAppState().translationSelection,
-                          options: FFButtonOptions(
-                            padding: const EdgeInsets.all(15),
-                            color: FlutterFlowTheme.of(context).lineColor,
-                            textStyle: FlutterFlowTheme.of(context).labelLarge,
-                            borderRadius: BorderRadius.circular(0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: FutureBuilder<ApiCallResponse>(
-                  future: BibleForUApiGroup.listOfVersesCall.call(
-                    versionShortName: FFAppState().translationSelection.isEmpty 
-                        ? 'KJV' // Provide default translation if none selected
-                        : FFAppState().translationSelection,
-                    booksShortName: widget.getBooksShortName ?? 'Gen',
-                    chaptersNum: widget.getChaptersNumbers ?? '1',
-                  ),
-                  builder: (context, snapshot) {
-                    // Show error if there is one
-                    if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    }
-                    
-                    // Show loading indicator while waiting
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-
-                    final verses = (getJsonField(snapshot.data!.jsonBody, r'$.data.verses') as List?)?.cast<Map<String, dynamic>>() ?? [];
-                    
-                    if (verses.isEmpty) {
-                      return const Center(child: Text('No verses found.'));
-                    }
-
-                    return ListView.builder(
-                      itemCount: verses.length,
-                      itemBuilder: (context, index) {
-                        final verse = verses[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                verse['ref']?.toString() ?? '',
-                                style: FlutterFlowTheme.of(context).bodySmall,
-                              ),
-                              const SizedBox(width: 5),
-                              Expanded(
-                                child: Text(
-                                  verse['text']?.toString() ?? '',
-                                  style: FlutterFlowTheme.of(context).bodyMedium,
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        FocusManager.instance.primaryFocus?.unfocus();
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
+        body: SafeArea(
+          top: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Material(
+                    color: Colors.transparent,
+                    elevation: 1.0,
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: FlutterFlowTheme.of(context).secondaryBackground,
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(15.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                FFButtonWidget(
+                                  onPressed: () async {
+                                    await showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      context: context,
+                                      builder: (context) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            FocusScope.of(context).unfocus();
+                                            FocusManager.instance.primaryFocus
+                                                ?.unfocus();
+                                          },
+                                          child: Padding(
+                                            padding: MediaQuery.viewInsetsOf(
+                                                context),
+                                            child: Container(
+                                              height: MediaQuery.sizeOf(context)
+                                                      .height *
+                                                  0.9,
+                                              child: BooksWidget(),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ).then((value) => safeSetState(() {}));
+                                  },
+                                  text: valueOrDefault<String>(
+                                    widget.getBooksShortName,
+                                    'Gen',
+                                  ),
+                                  options: FFButtonOptions(
+                                    width: 100.0,
+                                    padding: EdgeInsets.all(15.0),
+                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                    color:
+                                        FlutterFlowTheme.of(context).lineColor,
+                                    textStyle: FlutterFlowTheme.of(context)
+                                        .labelLarge
+                                        .override(
+                                          font: GoogleFonts.plusJakartaSans(
+                                            fontWeight: FontWeight.normal,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelLarge
+                                                    .fontStyle,
+                                          ),
+                                          color: FlutterFlowTheme.of(context)
+                                              .primaryText,
+                                          fontSize: 13.0,
+                                          letterSpacing: 0.0,
+                                          fontWeight: FontWeight.normal,
+                                          fontStyle:
+                                              FlutterFlowTheme.of(context)
+                                                  .labelLarge
+                                                  .fontStyle,
+                                        ),
+                                    elevation: 0.0,
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                      width: 1.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(0.0),
+                                  ),
+                                  showLoadingIndicator: false,
                                 ),
+                                Padding(
+                                  padding: EdgeInsetsDirectional.fromSTEB(
+                                      3.0, 0.0, 0.0, 0.0),
+                                  child: FFButtonWidget(
+                                    onPressed: () async {
+                                      context
+                                          .pushNamed(VersionWidget.routeName);
+                                    },
+                                    text: FFAppState().translationSelection,
+                                    options: FFButtonOptions(
+                                      padding: EdgeInsets.all(15.0),
+                                      iconPadding:
+                                          EdgeInsetsDirectional.fromSTEB(
+                                              0.0, 0.0, 0.0, 0.0),
+                                      color: FlutterFlowTheme.of(context)
+                                          .lineColor,
+                                      textStyle: FlutterFlowTheme.of(context)
+                                          .labelLarge
+                                          .override(
+                                            font: GoogleFonts.plusJakartaSans(
+                                              fontWeight: FontWeight.normal,
+                                              fontStyle:
+                                                  FlutterFlowTheme.of(context)
+                                                      .labelLarge
+                                                      .fontStyle,
+                                            ),
+                                            color: FlutterFlowTheme.of(context)
+                                                .primaryText,
+                                            fontSize: 13.0,
+                                            letterSpacing: 0.0,
+                                            fontWeight: FontWeight.normal,
+                                            fontStyle:
+                                                FlutterFlowTheme.of(context)
+                                                    .labelLarge
+                                                    .fontStyle,
+                                          ),
+                                      elevation: 0.0,
+                                      borderSide: BorderSide(
+                                        color: Colors.transparent,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: BorderRadius.circular(0.0),
+                                    ),
+                                    showLoadingIndicator: false,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: EdgeInsets.all(5.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  if (Theme.of(context).brightness ==
+                                      Brightness.dark)
+                                    InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        setDarkModeSetting(
+                                            context, ThemeMode.light);
+                                      },
+                                      child: Icon(
+                                        Icons.nights_stay_outlined,
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        size: 24.0,
+                                      ),
+                                    ),
+                                  if (Theme.of(context).brightness ==
+                                      Brightness.light)
+                                    InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        setDarkModeSetting(
+                                            context, ThemeMode.dark);
+                                      },
+                                      child: Icon(
+                                        Icons.wb_sunny_outlined,
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        size: 24.0,
+                                      ),
+                                    ),
+                                  Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        10.0, 0.0, 0.0, 0.0),
+                                    child: InkWell(
+                                      splashColor: Colors.transparent,
+                                      focusColor: Colors.transparent,
+                                      hoverColor: Colors.transparent,
+                                      highlightColor: Colors.transparent,
+                                      onTap: () async {
+                                        await showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          enableDrag: false,
+                                          context: context,
+                                          builder: (context) {
+                                            return GestureDetector(
+                                              onTap: () {
+                                                FocusScope.of(context)
+                                                    .unfocus();
+                                                FocusManager
+                                                    .instance.primaryFocus
+                                                    ?.unfocus();
+                                              },
+                                              child: Padding(
+                                                padding:
+                                                    MediaQuery.viewInsetsOf(
+                                                        context),
+                                                child: Container(
+                                                  height:
+                                                      MediaQuery.sizeOf(context)
+                                                              .height *
+                                                          0.9,
+                                                  child: BooksWidget(),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ).then((value) => safeSetState(() {}));
+                                      },
+                                      child: Icon(
+                                        Icons.search_rounded,
+                                        color: FlutterFlowTheme.of(context)
+                                            .primaryText,
+                                        size: 24.0,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(15.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Expanded(
+                        child: FutureBuilder<ApiCallResponse>(
+                          future: BibleForUApiGroup.listOfVersesCall.call(
+                            versionShortName: FFAppState().translationSelection,
+                            booksShortName: valueOrDefault<String>(
+                              widget.getBooksShortName,
+                              'Gen',
+                            ),
+                            chaptersNum: valueOrDefault<String>(
+                              widget.getChaptersNumbers,
+                              '1',
+                            ),
                           ),
-                        );
-                      },
-                    );
-                  },
+                          builder: (context, snapshot) {
+                            // Customize what your widget looks like when it's loading.
+                            if (!snapshot.hasData) {
+                              return Center(
+                                child: LinearProgressIndicator(
+                                  color: FlutterFlowTheme.of(context).primary,
+                                ),
+                              );
+                            }
+                            final listViewListOfVersesResponse = snapshot.data!;
+
+                            return Builder(
+                              builder: (context) {
+                                final versesItems = getJsonField(
+                                  listViewListOfVersesResponse.jsonBody,
+                                  r'''$.data.verses[:]''',
+                                ).toList();
+
+                                return ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: versesItems.length,
+                                  itemBuilder: (context, versesItemsIndex) {
+                                    final versesItemsItem =
+                                        versesItems[versesItemsIndex];
+                                    return Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0.0, 0.0, 0.0, 5.0),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            getJsonField(
+                                              versesItemsItem,
+                                              r'''$.ref''',
+                                            ).toString(),
+                                            textAlign: TextAlign.start,
+                                            style: FlutterFlowTheme.of(context)
+                                                .bodyMedium
+                                                .override(
+                                                  font: GoogleFonts
+                                                      .plusJakartaSans(
+                                                    fontWeight: FontWeight.w300,
+                                                    fontStyle:
+                                                        FlutterFlowTheme.of(
+                                                                context)
+                                                            .bodyMedium
+                                                            .fontStyle,
+                                                  ),
+                                                  fontSize: 8.0,
+                                                  letterSpacing: 0.0,
+                                                  fontWeight: FontWeight.w300,
+                                                  fontStyle:
+                                                      FlutterFlowTheme.of(
+                                                              context)
+                                                          .bodyMedium
+                                                          .fontStyle,
+                                                ),
+                                          ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(5.0, 0.0, 0.0, 0.0),
+                                              child: Text(
+                                                getJsonField(
+                                                  versesItemsItem,
+                                                  r'''$.text''',
+                                                ).toString(),
+                                                textAlign: TextAlign.start,
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          font: GoogleFonts
+                                                              .plusJakartaSans(
+                                                            fontWeight:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontWeight,
+                                                            fontStyle:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                          ),
+                                                          letterSpacing: 0.0,
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                        ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

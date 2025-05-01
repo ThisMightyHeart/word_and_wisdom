@@ -572,7 +572,12 @@ class ApiManager {
         _apiCache[callOptions] = result;
       }
     } catch (e) {
-      result = ApiCallResponse(null, {}, -1, exception: e);
+      result = ApiCallResponse(
+        null,
+        {},
+        500,
+        exception: e,
+      );
     }
 
     return result;
