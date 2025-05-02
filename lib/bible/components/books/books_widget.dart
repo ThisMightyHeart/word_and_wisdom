@@ -213,10 +213,15 @@ class _BooksWidgetState extends State<BooksWidget> {
 
                         return Builder(
                           builder: (context) {
-                            final bookItems = getJsonField(
+                            final bookItemsData = getJsonField(
                               listViewListOfBooksResponse.jsonBody,
-                              r'''$.data.books[:]''',
-                            ).toList();
+                              r'''$.data''',
+                            );
+                            if (bookItemsData == null || bookItemsData is! List) {
+                              print('API response was: ${listViewListOfBooksResponse.jsonBody}');
+                              return Center(child: Text('No data available'));
+                            }
+                            final bookItems = bookItemsData;
 
                             return ListView.builder(
                               padding: EdgeInsets.zero,

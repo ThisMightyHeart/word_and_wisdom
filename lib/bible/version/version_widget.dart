@@ -215,32 +215,21 @@ class _VersionWidgetState extends State<VersionWidget> {
                           }
 
                           final response = snapshot.data!;
-                          
-                          if (!response.succeeded) {
-                            return Center(
-                              child: Text('API Error: ${response.statusCode}'),
-                            );
+                          final data = getJsonField(response.jsonBody, r'''$.data''');
+                          if (data == null || data is! List) {
+                            return Center(child: Text('No data available'));
                           }
-
-                          final List<dynamic>? versions = response.jsonBody is List 
-                              ? response.jsonBody
-                              : response.jsonBody?['data'] as List<dynamic>?;
-                          
-                          if (versions == null) {
-                            return Center(
-                              child: Text('No versions available'),
-                            );
-                          }
+                          final items = data;
 
                           return ListView.builder(
                             padding: EdgeInsets.zero,
                             shrinkWrap: true,
                             scrollDirection: Axis.vertical,
-                            itemCount: versions.length,
+                            itemCount: items.length,
                             itemBuilder: (context, index) {
-                              final version = versions[index];
-                              final ref = version['ref']?.toString() ?? 'Unknown';
-                              final name = version['name']?.toString() ?? 'Unknown Version';
+                              final item = items[index];
+                              final ref = item['ref']?.toString() ?? 'Unknown';
+                              final name = item['name']?.toString() ?? 'Unknown Version';
 
                               return InkWell(
                                 splashColor: Colors.transparent,
@@ -248,9 +237,9 @@ class _VersionWidgetState extends State<VersionWidget> {
                                 hoverColor: Colors.transparent,
                                 highlightColor: Colors.transparent,
                                 onTap: () async {
-                                  context.pushNamed(BibleIndexWidget.routeName);
                                   FFAppState().translationSelection = ref;
                                   FFAppState().update(() {});
+                                  context.pushNamed(BibleIndexWidget.routeName);
                                 },
                                 child: Container(
                                   width: double.infinity,

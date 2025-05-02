@@ -31,7 +31,7 @@ class FFAppState extends ChangeNotifier {
 
   late SharedPreferences prefs;
 
-  String _translationSelection = 'ESV';
+  String _translationSelection = 'KJV';
   String get translationSelection => _translationSelection;
   set translationSelection(String value) {
     _translationSelection = value;

@@ -332,10 +332,15 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
 
                             return Builder(
                               builder: (context) {
-                                final versesItems = getJsonField(
+                                final data = getJsonField(
                                   listViewListOfVersesResponse.jsonBody,
-                                  r'''$.data.verses[:]''',
-                                ).toList();
+                                  r'''$.data.verses''',
+                                );
+                                if (data == null || data is! List) {
+                                  print('API response was: ${listViewListOfVersesResponse.jsonBody}');
+                                  return Center(child: Text('No data available'));
+                                }
+                                final versesItems = data;
 
                                 return ListView.builder(
                                   padding: EdgeInsets.zero,

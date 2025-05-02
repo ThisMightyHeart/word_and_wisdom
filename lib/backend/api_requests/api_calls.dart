@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 
-import '/flutter_flow/flutter_flow_util.dart';
 import 'api_manager.dart';
 
 export 'api_manager.dart' show ApiCallResponse;
@@ -14,58 +12,31 @@ const _kPrivateApiFunctionName = 'ffPrivateApiCall';
 class BibleForUApiGroup {
   static String getBaseUrl() => 'https://bible4u.net/api/v1/';
   static Map<String, String> headers = {};
-  static final ListOfVersionsCall listOfVersionsCall = ListOfVersionsCall();
-  static final ListOfBooksCall listOfBooksCall = ListOfBooksCall();
-  static final ListofChaptersCall listofChaptersCall = ListofChaptersCall();
-  static final ListOfVersesCall listOfVersesCall = ListOfVersesCall();
+  static ListOfVersionsCall listOfVersionsCall = ListOfVersionsCall();
+  static ListOfBooksCall listOfBooksCall = ListOfBooksCall();
+  static ListofChaptersCall listofChaptersCall = ListofChaptersCall();
+  static ListOfVersesCall listOfVersesCall = ListOfVersesCall();
 }
 
 class ListOfVersionsCall {
-  Future<ApiCallResponse> call() async {
+  Future<ApiCallResponse> call({
+    String? versionsShortName = '',
+  }) async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
-    try {
-      final response = await ApiManager.instance.makeApiCall(
-        callName: 'ListOfVersions',
-        apiUrl: '${baseUrl}bibles',
-        callType: ApiCallType.GET,
-        headers: {
-          'Accept': 'application/json',
-        },
-        params: {},
-        returnBody: true,
-        encodeBodyUtf8: false,
-        decodeUtf8: true,
-        cache: false,
-        isStreamingApi: false,
-        alwaysAllowBody: false,
-      );
 
-      if (response.succeeded && response.jsonBody != null) {
-        final Map<String, dynamic> formattedResponse = {
-          'data': response.jsonBody['data'] ?? [],
-          'success': response.jsonBody['success'] ?? false
-        };
-        
-        return ApiCallResponse(
-          formattedResponse,
-          response.headers,
-          response.statusCode,
-        );
-      }
-      
-      return response;
-    } catch (e) {
-      print('API call error: $e');
-      return ApiCallResponse(
-        {
-          'data': [],
-          'success': false,
-          'error': e.toString()
-        },
-        {},
-        500,
-      );
-    }
+    return ApiManager.instance.makeApiCall(
+      callName: 'ListOfVersions',
+      apiUrl: '${baseUrl}bibles',
+      callType: ApiCallType.GET,
+      headers: {},
+      params: {},
+      returnBody: true,
+      encodeBodyUtf8: false,
+      decodeUtf8: false,
+      cache: false,
+      isStreamingApi: false,
+      alwaysAllowBody: false,
+    );
   }
 }
 
@@ -74,17 +45,16 @@ class ListOfBooksCall {
     String? versionsShortName = '',
   }) async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
+
     return ApiManager.instance.makeApiCall(
       callName: 'ListOfBooks',
-      apiUrl: '${baseUrl}bibles/$versionsShortName',
+      apiUrl: '${baseUrl}bibles/${versionsShortName}/books',
       callType: ApiCallType.GET,
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: {},
       params: {},
       returnBody: true,
       encodeBodyUtf8: false,
-      decodeUtf8: true,
+      decodeUtf8: false,
       cache: false,
       isStreamingApi: false,
       alwaysAllowBody: false,
@@ -98,17 +68,16 @@ class ListofChaptersCall {
     String? booksShortName = '',
   }) async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
+
     return ApiManager.instance.makeApiCall(
       callName: 'ListofChapters',
-      apiUrl: '${baseUrl}bibles/$versionsShortName/books/$booksShortName',
+      apiUrl: '${baseUrl}bibles/${versionsShortName}/books/${booksShortName}',
       callType: ApiCallType.GET,
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: {},
       params: {},
       returnBody: true,
       encodeBodyUtf8: false,
-      decodeUtf8: true,
+      decodeUtf8: false,
       cache: false,
       isStreamingApi: false,
       alwaysAllowBody: false,
@@ -123,17 +92,17 @@ class ListOfVersesCall {
     String? chaptersNum = '',
   }) async {
     final baseUrl = BibleForUApiGroup.getBaseUrl();
+
     return ApiManager.instance.makeApiCall(
       callName: 'ListOfVerses',
-      apiUrl: '${baseUrl}bibles/$versionShortName/books/$booksShortName/chapters/$chaptersNum',
+      apiUrl:
+          '${baseUrl}bibles/${versionShortName}/books/${booksShortName}/chapters/${chaptersNum}',
       callType: ApiCallType.GET,
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: {},
       params: {},
       returnBody: true,
       encodeBodyUtf8: false,
-      decodeUtf8: true,
+      decodeUtf8: false,
       cache: false,
       isStreamingApi: false,
       alwaysAllowBody: false,
@@ -142,3 +111,47 @@ class ListOfVersesCall {
 }
 
 /// End BibleForUApi Group Code
+
+class ApiPagingParams {
+  int nextPageNumber = 0;
+  int numItems = 0;
+  dynamic lastResponse;
+
+  ApiPagingParams({
+    required this.nextPageNumber,
+    required this.numItems,
+    required this.lastResponse,
+  });
+
+  @override
+  String toString() =>
+      'PagingParams(nextPageNumber: $nextPageNumber, numItems: $numItems, lastResponse: $lastResponse,)';
+}
+
+String _toEncodable(dynamic item) {
+  return item;
+}
+
+String _serializeList(List? list) {
+  list ??= <String>[];
+  try {
+    return json.encode(list, toEncodable: _toEncodable);
+  } catch (_) {
+    if (kDebugMode) {
+      print("List serialization failed. Returning empty list.");
+    }
+    return '[]';
+  }
+}
+
+String _serializeJson(dynamic jsonVar, [bool isList = false]) {
+  jsonVar ??= (isList ? [] : {});
+  try {
+    return json.encode(jsonVar, toEncodable: _toEncodable);
+  } catch (_) {
+    if (kDebugMode) {
+      print("Json serialization failed. Returning empty json.");
+    }
+    return isList ? '[]' : '{}';
+  }
+} 

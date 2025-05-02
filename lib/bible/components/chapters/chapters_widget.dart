@@ -124,10 +124,23 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
 
                         return Builder(
                           builder: (context) {
-                            final chapterItems = getJsonField(
+                            final chapterItemsData = getJsonField(
                               chaptersGridViewListofChaptersResponse.jsonBody,
-                              r'''$.data.chapters[:]''',
-                            ).toList();
+                              r'''$.data.chapters''',
+                            );
+                            if (chapterItemsData == null || chapterItemsData is! List) {
+                              print('API response was: ${chaptersGridViewListofChaptersResponse.jsonBody}');
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('No chapters available'),
+                                    Text('Book: ${widget.getBooksShortName}'),
+                                  ],
+                                ),
+                              );
+                            }
+                            final chapterItems = chapterItemsData;
 
                             return GridView.builder(
                               padding: EdgeInsets.zero,
