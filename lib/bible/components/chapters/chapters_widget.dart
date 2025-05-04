@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'chapters_model.dart';
+import '/bible/bible_index/bible_index_widget.dart';
 export 'chapters_model.dart';
 
 class ChaptersWidget extends StatefulWidget {
@@ -124,23 +125,10 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
 
                         return Builder(
                           builder: (context) {
-                            final chapterItemsData = getJsonField(
+                            final chapterItems = getJsonField(
                               chaptersGridViewListofChaptersResponse.jsonBody,
-                              r'''$.data.chapters''',
-                            );
-                            if (chapterItemsData == null || chapterItemsData is! List) {
-                              print('API response was: ${chaptersGridViewListofChaptersResponse.jsonBody}');
-                              return Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('No chapters available'),
-                                    Text('Book: ${widget.getBooksShortName}'),
-                                  ],
-                                ),
-                              );
-                            }
-                            final chapterItems = chapterItemsData;
+                              r'''$.data.chapters[:]''',
+                            ).toList();
 
                             return GridView.builder(
                               padding: EdgeInsets.zero,
@@ -159,30 +147,22 @@ class _ChaptersWidgetState extends State<ChaptersWidget> {
                                     chapterItems[chapterItemsIndex];
                                 return FFButtonWidget(
                                   onPressed: () async {
-                                    await showModalBottomSheet(
-                                      isScrollControlled: true,
-                                      backgroundColor: Colors.transparent,
-                                      context: context,
-                                      builder: (context) {
-                                        return Padding(
-                                          padding:
-                                              MediaQuery.viewInsetsOf(context),
-                                          child: Container(
-                                            height: MediaQuery.sizeOf(context)
-                                                    .height *
-                                                0.9,
-                                            child: VersesWidget(
-                                              getBooksShortName:
-                                                  widget.getBooksShortName,
-                                              chaptersNum: getJsonField(
-                                                chapterItemsItem,
-                                                r'''$.ref''',
-                                              ).toString(),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ).then((value) => safeSetState(() {}));
+                                    context.pushNamed(
+                                      BibleIndexWidget.routeName,
+                                      queryParameters: {
+                                        'getBooksShortName': serializeParam(
+                                          widget.getBooksShortName,
+                                          ParamType.String,
+                                        ),
+                                        'getChaptersNumbers': serializeParam(
+                                          getJsonField(
+                                            chapterItemsItem,
+                                            r'''$.ref''',
+                                          ).toString(),
+                                          ParamType.String,
+                                        ),
+                                      }.withoutNulls,
+                                    );
                                   },
                                   text: getJsonField(
                                     chapterItemsItem,

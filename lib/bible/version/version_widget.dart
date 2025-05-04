@@ -6,7 +6,6 @@ import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'version_model.dart';
-import 'package:go_router/go_router.dart';
 export 'version_model.dart';
 
 class VersionWidget extends StatefulWidget {
@@ -64,7 +63,7 @@ class _VersionWidgetState extends State<VersionWidget> {
               size: 30.0,
             ),
             onPressed: () async {
-              context.pop();
+              Navigator.of(context).pop();
             },
           ),
           title: Text(
@@ -194,100 +193,149 @@ class _VersionWidgetState extends State<VersionWidget> {
                       FutureBuilder<ApiCallResponse>(
                         future: BibleForUApiGroup.listOfVersionsCall.call(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          // Customize what your widget looks like when it's loading.
+                          if (!snapshot.hasData) {
                             return Center(
-                              child: CircularProgressIndicator(
+                              child: LinearProgressIndicator(
                                 color: FlutterFlowTheme.of(context).primary,
                               ),
                             );
                           }
+                          final listViewListOfVersionsResponse = snapshot.data!;
 
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Text('Error: ${snapshot.error}'),
-                            );
-                          }
+                          return Builder(
+                            builder: (context) {
+                              final listOfBibleVersionItems = getJsonField(
+                                listViewListOfVersionsResponse.jsonBody,
+                                r'''$.data''',
+                              ).toList();
 
-                          if (!snapshot.hasData || snapshot.data == null) {
-                            return Center(
-                              child: Text('No data available'),
-                            );
-                          }
-
-                          final response = snapshot.data!;
-                          final data = getJsonField(response.jsonBody, r'''$.data''');
-                          if (data == null || data is! List) {
-                            return Center(child: Text('No data available'));
-                          }
-                          final items = data;
-
-                          return ListView.builder(
-                            padding: EdgeInsets.zero,
-                            shrinkWrap: true,
-                            scrollDirection: Axis.vertical,
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              final item = items[index];
-                              final ref = item['ref']?.toString() ?? 'Unknown';
-                              final name = item['name']?.toString() ?? 'Unknown Version';
-
-                              return InkWell(
-                                splashColor: Colors.transparent,
-                                focusColor: Colors.transparent,
-                                hoverColor: Colors.transparent,
-                                highlightColor: Colors.transparent,
-                                onTap: () async {
-                                  FFAppState().translationSelection = ref;
-                                  FFAppState().update(() {});
-                                  context.pushNamed(BibleIndexWidget.routeName);
-                                },
-                                child: Container(
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(10.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsetsDirectional
-                                              .fromSTEB(0.0, 0.0, 0.0, 5.0),
-                                          child: Text(
-                                            ref,
-                                            style: FlutterFlowTheme.of(context)
-                                                .bodyMedium
-                                                .override(
-                                                  font: GoogleFonts
-                                                      .plusJakartaSans(
-                                                    fontWeight:
-                                                        FontWeight.w600,
-                                                  ),
-                                                  fontSize: 15.0,
-                                                ),
-                                          ),
-                                        ),
-                                        Text(
-                                          name,
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts
-                                                    .plusJakartaSans(),
-                                                color: FlutterFlowTheme.of(
-                                                        context)
-                                                    .accent1,
-                                                fontSize: 13.0,
+                              return ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                scrollDirection: Axis.vertical,
+                                itemCount: listOfBibleVersionItems.length,
+                                itemBuilder:
+                                    (context, listOfBibleVersionItemsIndex) {
+                                  final listOfBibleVersionItemsItem =
+                                      listOfBibleVersionItems[
+                                          listOfBibleVersionItemsIndex];
+                                  return InkWell(
+                                    splashColor: Colors.transparent,
+                                    focusColor: Colors.transparent,
+                                    hoverColor: Colors.transparent,
+                                    highlightColor: Colors.transparent,
+                                    onTap: () async {
+                                      final selectedTranslation = getJsonField(
+                                        listOfBibleVersionItemsItem,
+                                        r'''$.ref''',
+                                      ).toString();
+                                      
+                                      print('Selected Translation: $selectedTranslation');
+                                      print('Current Translation Selection: ${FFAppState().translationSelection}');
+                                      
+                                      FFAppState().translationSelection = selectedTranslation;
+                                      FFAppState().update(() {});
+                                      
+                                      print('Updated Translation Selection: ${FFAppState().translationSelection}');
+                                      
+                                      if (mounted) {
+                                        Navigator.of(context).pop(selectedTranslation);
+                                      }
+                                    },
+                                    child: Container(
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryBackground,
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(10.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsetsDirectional
+                                                  .fromSTEB(0.0, 0.0, 0.0, 5.0),
+                                              child: Text(
+                                                getJsonField(
+                                                  listOfBibleVersionItemsItem,
+                                                  r'''$.ref''',
+                                                ).toString(),
+                                                style:
+                                                    FlutterFlowTheme.of(context)
+                                                        .bodyMedium
+                                                        .override(
+                                                          font: GoogleFonts
+                                                              .plusJakartaSans(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontStyle:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .fontStyle,
+                                                          ),
+                                                          fontSize: 15.0,
+                                                          letterSpacing: 0.0,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                        ),
                                               ),
+                                            ),
+                                            Text(
+                                              getJsonField(
+                                                listOfBibleVersionItemsItem,
+                                                r'''$.name''',
+                                              ).toString(),
+                                              style:
+                                                  FlutterFlowTheme.of(context)
+                                                      .bodyMedium
+                                                      .override(
+                                                        font: GoogleFonts
+                                                            .plusJakartaSans(
+                                                          fontWeight:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontWeight,
+                                                          fontStyle:
+                                                              FlutterFlowTheme.of(
+                                                                      context)
+                                                                  .bodyMedium
+                                                                  .fontStyle,
+                                                        ),
+                                                        color:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .accent1,
+                                                        fontSize: 13.0,
+                                                        letterSpacing: 0.0,
+                                                        fontWeight:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontWeight,
+                                                        fontStyle:
+                                                            FlutterFlowTheme.of(
+                                                                    context)
+                                                                .bodyMedium
+                                                                .fontStyle,
+                                                      ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               );
                             },
                           );

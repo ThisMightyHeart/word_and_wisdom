@@ -87,7 +87,7 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                               children: [
                                 FFButtonWidget(
                                   onPressed: () async {
-                                    await showModalBottomSheet(
+                                    final result = await showModalBottomSheet(
                                       isScrollControlled: true,
                                       backgroundColor: Colors.transparent,
                                       context: context,
@@ -95,22 +95,33 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                                         return GestureDetector(
                                           onTap: () {
                                             FocusScope.of(context).unfocus();
-                                            FocusManager.instance.primaryFocus
-                                                ?.unfocus();
+                                            FocusManager.instance.primaryFocus?.unfocus();
                                           },
                                           child: Padding(
-                                            padding: MediaQuery.viewInsetsOf(
-                                                context),
+                                            padding: MediaQuery.viewInsetsOf(context),
                                             child: Container(
-                                              height: MediaQuery.sizeOf(context)
-                                                      .height *
-                                                  0.9,
+                                              height: MediaQuery.sizeOf(context).height * 0.9,
                                               child: BooksWidget(),
                                             ),
                                           ),
                                         );
                                       },
-                                    ).then((value) => safeSetState(() {}));
+                                    );
+                                    if (result != null) {
+                                      context.pushNamed(
+                                        BibleIndexWidget.routeName,
+                                        queryParameters: {
+                                          'getBooksShortName': serializeParam(
+                                            result.toString(),
+                                            ParamType.String,
+                                          ),
+                                          'getChaptersNumbers': serializeParam(
+                                            widget.getChaptersNumbers ?? '1',
+                                            ParamType.String,
+                                          ),
+                                        }.withoutNulls,
+                                      );
+                                    }
                                   },
                                   text: valueOrDefault<String>(
                                     widget.getBooksShortName,
@@ -119,30 +130,19 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                                   options: FFButtonOptions(
                                     width: 100.0,
                                     padding: EdgeInsets.all(15.0),
-                                    iconPadding: EdgeInsetsDirectional.fromSTEB(
-                                        0.0, 0.0, 0.0, 0.0),
-                                    color:
-                                        FlutterFlowTheme.of(context).lineColor,
-                                    textStyle: FlutterFlowTheme.of(context)
-                                        .labelLarge
-                                        .override(
-                                          font: GoogleFonts.plusJakartaSans(
-                                            fontWeight: FontWeight.normal,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .labelLarge
-                                                    .fontStyle,
-                                          ),
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryText,
-                                          fontSize: 13.0,
-                                          letterSpacing: 0.0,
-                                          fontWeight: FontWeight.normal,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .labelLarge
-                                                  .fontStyle,
-                                        ),
+                                    iconPadding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                                    color: FlutterFlowTheme.of(context).lineColor,
+                                    textStyle: FlutterFlowTheme.of(context).labelLarge.override(
+                                      font: GoogleFonts.plusJakartaSans(
+                                        fontWeight: FontWeight.normal,
+                                        fontStyle: FlutterFlowTheme.of(context).labelLarge.fontStyle,
+                                      ),
+                                      color: FlutterFlowTheme.of(context).primaryText,
+                                      fontSize: 13.0,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FontWeight.normal,
+                                      fontStyle: FlutterFlowTheme.of(context).labelLarge.fontStyle,
+                                    ),
                                     elevation: 0.0,
                                     borderSide: BorderSide(
                                       color: Colors.transparent,
@@ -157,10 +157,19 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                                       3.0, 0.0, 0.0, 0.0),
                                   child: FFButtonWidget(
                                     onPressed: () async {
-                                      context
-                                          .pushNamed(VersionWidget.routeName);
+                                      print('Current translation: ${FFAppState().translationSelection}');
+                                      final result = await context.push('/version');
+                                      print('Returned from version selection with result: $result');
+                                      if (result != null) {
+                                        setState(() {
+                                          FFAppState().translationSelection = result.toString();
+                                        });
+                                      }
                                     },
-                                    text: FFAppState().translationSelection,
+                                    text: valueOrDefault<String>(
+                                      FFAppState().translationSelection,
+                                      'Select Translation',
+                                    ),
                                     options: FFButtonOptions(
                                       padding: EdgeInsets.all(15.0),
                                       iconPadding:
@@ -310,11 +319,11 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                         child: FutureBuilder<ApiCallResponse>(
                           future: BibleForUApiGroup.listOfVersesCall.call(
                             versionShortName: FFAppState().translationSelection,
-                            booksShortName: valueOrDefault<String>(
+                            bookShortName: valueOrDefault<String>(
                               widget.getBooksShortName,
                               'Gen',
                             ),
-                            chaptersNum: valueOrDefault<String>(
+                            chapterNumber: valueOrDefault<String>(
                               widget.getChaptersNumbers,
                               '1',
                             ),
@@ -328,19 +337,64 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                                 ),
                               );
                             }
+                            
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  'Error loading verses: ${snapshot.error}',
+                                  style: FlutterFlowTheme.of(context).bodyMedium,
+                                ),
+                              );
+                            }
+
                             final listViewListOfVersesResponse = snapshot.data!;
+                            
+                            // Debug print the response
+                            print('Full API Response: ${listViewListOfVersesResponse.jsonBody}');
+                            print('Translation Selection: ${FFAppState().translationSelection}');
+                            print('Book: ${widget.getBooksShortName}');
+                            print('Chapter: ${widget.getChaptersNumbers}');
+                            
+                            // Check the data structure
+                            final data = getJsonField(
+                              listViewListOfVersesResponse.jsonBody,
+                              r'''$.data''',
+                            );
+                            print('Data field: $data');
+                            
+                            final verses = getJsonField(
+                              listViewListOfVersesResponse.jsonBody,
+                              r'''$.data.verses''',
+                            );
+                            print('Verses field: $verses');
 
                             return Builder(
                               builder: (context) {
-                                final data = getJsonField(
+                                final versesData = getJsonField(
                                   listViewListOfVersesResponse.jsonBody,
                                   r'''$.data.verses''',
                                 );
-                                if (data == null || data is! List) {
-                                  print('API response was: ${listViewListOfVersesResponse.jsonBody}');
-                                  return Center(child: Text('No data available'));
+                                
+                                if (versesData == null) {
+                                  return Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          'No verses found',
+                                          style: FlutterFlowTheme.of(context).bodyMedium,
+                                        ),
+                                        Text(
+                                          'Please check your translation selection',
+                                          style: FlutterFlowTheme.of(context).bodySmall,
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 }
-                                final versesItems = data;
+
+                                final versesItems = versesData.toList();
+                                print('Number of verses found: ${versesItems.length}');
 
                                 return ListView.builder(
                                   padding: EdgeInsets.zero,
@@ -350,6 +404,15 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                                   itemBuilder: (context, versesItemsIndex) {
                                     final versesItemsItem =
                                         versesItems[versesItemsIndex];
+                                    final verseRef = getJsonField(
+                                      versesItemsItem,
+                                      r'''$.ref''',
+                                    ).toString();
+                                    final verseText = getJsonField(
+                                      versesItemsItem,
+                                      r'''$.text''',
+                                    ).toString();
+                                    print('Verse $verseRef: $verseText');
                                     return Padding(
                                       padding: EdgeInsetsDirectional.fromSTEB(
                                           0.0, 0.0, 0.0, 5.0),
@@ -359,10 +422,7 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            getJsonField(
-                                              versesItemsItem,
-                                              r'''$.ref''',
-                                            ).toString(),
+                                            verseRef,
                                             textAlign: TextAlign.start,
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
@@ -391,10 +451,7 @@ class _BibleIndexWidgetState extends State<BibleIndexWidget> {
                                               padding: EdgeInsetsDirectional
                                                   .fromSTEB(5.0, 0.0, 0.0, 0.0),
                                               child: Text(
-                                                getJsonField(
-                                                  versesItemsItem,
-                                                  r'''$.text''',
-                                                ).toString(),
+                                                verseText,
                                                 textAlign: TextAlign.start,
                                                 style:
                                                     FlutterFlowTheme.of(context)

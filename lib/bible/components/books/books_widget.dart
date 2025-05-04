@@ -213,15 +213,10 @@ class _BooksWidgetState extends State<BooksWidget> {
 
                         return Builder(
                           builder: (context) {
-                            final bookItemsData = getJsonField(
+                            final bookItems = getJsonField(
                               listViewListOfBooksResponse.jsonBody,
-                              r'''$.data''',
-                            );
-                            if (bookItemsData == null || bookItemsData is! List) {
-                              print('API response was: ${listViewListOfBooksResponse.jsonBody}');
-                              return Center(child: Text('No data available'));
-                            }
-                            final bookItems = bookItemsData;
+                              r'''$.data.books[:]''',
+                            ).toList();
 
                             return ListView.builder(
                               padding: EdgeInsets.zero,
@@ -236,28 +231,11 @@ class _BooksWidgetState extends State<BooksWidget> {
                                   hoverColor: Colors.transparent,
                                   highlightColor: Colors.transparent,
                                   onTap: () async {
-                                    await showModalBottomSheet(
-                                      isScrollControlled: true,
-                                      backgroundColor: Colors.transparent,
-                                      context: context,
-                                      builder: (context) {
-                                        return Padding(
-                                          padding:
-                                              MediaQuery.viewInsetsOf(context),
-                                          child: Container(
-                                            height: MediaQuery.sizeOf(context)
-                                                    .height *
-                                                0.9,
-                                            child: ChaptersWidget(
-                                              getBooksShortName: getJsonField(
-                                                bookItemsItem,
-                                                r'''$.ref''',
-                                              ).toString(),
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    ).then((value) => safeSetState(() {}));
+                                    final selectedBook = getJsonField(
+                                      bookItemsItem,
+                                      r'''$.ref''',
+                                    ).toString();
+                                    Navigator.pop(context, selectedBook); // Return the selected book
                                   },
                                   child: Container(
                                     width: double.infinity,
@@ -270,52 +248,9 @@ class _BooksWidgetState extends State<BooksWidget> {
                                       child: Row(
                                         mainAxisSize: MainAxisSize.max,
                                         children: [
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFFB9B4EF),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(5.0),
-                                              child: Text(
-                                                bookItemsIndex.toString(),
-                                                style:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .override(
-                                                          font: GoogleFonts
-                                                              .plusJakartaSans(
-                                                            fontWeight:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontWeight,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .bodyMedium
-                                                                    .fontStyle,
-                                                          ),
-                                                          fontSize: 10.0,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .bodyMedium
-                                                                  .fontStyle,
-                                                        ),
-                                              ),
-                                            ),
-                                          ),
                                           Padding(
-                                            padding:
-                                                EdgeInsetsDirectional.fromSTEB(
-                                                    5.0, 0.0, 0.0, 0.0),
+                                            padding: EdgeInsetsDirectional.fromSTEB(
+                                                5.0, 0.0, 0.0, 0.0),
                                             child: Text(
                                               getJsonField(
                                                 bookItemsItem,

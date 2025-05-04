@@ -110,8 +110,8 @@ class _VersesWidgetState extends State<VersesWidget> {
                     child: FutureBuilder<ApiCallResponse>(
                       future: BibleForUApiGroup.listOfVersesCall.call(
                         versionShortName: FFAppState().translationSelection,
-                        booksShortName: widget.getBooksShortName,
-                        chaptersNum: widget.chaptersNum,
+                        bookShortName: widget.getBooksShortName,
+                        chapterNumber: widget.chaptersNum,
                       ),
                       builder: (context, snapshot) {
                         // Customize what your widget looks like when it's loading.
@@ -124,33 +124,13 @@ class _VersesWidgetState extends State<VersesWidget> {
                         }
                         final chaptersGridViewListOfVersesResponse =
                             snapshot.data!;
-                        print('API call parameters: version=${FFAppState().translationSelection}, book=${widget.getBooksShortName}, chapter=${widget.chaptersNum}');
-                        print('API response: ${chaptersGridViewListOfVersesResponse.jsonBody}');
 
                         return Builder(
                           builder: (context) {
-                            final verseItemsData = getJsonField(
+                            final verseItems = getJsonField(
                               chaptersGridViewListOfVersesResponse.jsonBody,
-                              r'''$.data.verses''',
-                            );
-                            if (verseItemsData == null || verseItemsData is! List) {
-                              print('API response was: ${chaptersGridViewListOfVersesResponse.jsonBody}');
-                              print('Translation: ${FFAppState().translationSelection}');
-                              print('Book: ${widget.getBooksShortName}');
-                              print('Chapter: ${widget.chaptersNum}');
-                              return Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('No verses available'),
-                                    Text('Translation: ${FFAppState().translationSelection}'),
-                                    Text('Book: ${widget.getBooksShortName}'),
-                                    Text('Chapter: ${widget.chaptersNum}'),
-                                  ],
-                                ),
-                              );
-                            }
-                            final verseItems = verseItemsData;
+                              r'''$.data.verses[:]''',
+                            ).toList();
 
                             return GridView.builder(
                               padding: EdgeInsets.zero,
